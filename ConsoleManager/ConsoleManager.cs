@@ -1,7 +1,7 @@
 ﻿namespace ConsoleIOManager;
 using static System.Console;
 
-//-----------------------------V1.2-KeganF------------------------------//
+//-----------------------------V1.3-KeganF------------------------------//
 // CLASS > ConsoleManager                                               //
 //         Provides static methods for console applications             //
 //         - Display customs prompts, menus, and options                //
@@ -9,8 +9,10 @@ using static System.Console;
 //----------------------------------------------------------------------//
 public static class ConsoleManager
 {
+    //------------------------------v-Fields-v------------------------------//
     private static readonly string inputPrompt = "> ";
     
+    //-----------------------------v-Methods-v------------------------------//
     //----------------------------------------------------------------------//
     // METHOD > DisplayCheckBoxes                                           //          
     //          Displays the provided options in a check box format         //
@@ -22,7 +24,7 @@ public static class ConsoleManager
     // RETURN > (int) the index of the selected option                      //
     //----------------------------------------------------------------------//
     public static int DisplayCheckBoxes(string[] options, 
-        string prompt = "Select one of the following options:")
+        string prompt = "Select one of the following options:") 
     {
         int selectedIndex = 0;
         ConsoleKeyInfo input;
@@ -39,7 +41,7 @@ public static class ConsoleManager
 
             // Read input from user
             input = ReadKey();
-            // TAB to select next option
+            // TAB to cycle to next option
             if (input.Key == ConsoleKey.Tab)
             {
                 selectedIndex++;
@@ -55,6 +57,25 @@ public static class ConsoleManager
         } while (input.Key != ConsoleKey.Enter);
 
         return selectedIndex;
+    }
+
+    //----------------------------------------------------------------------//
+    // METHOD > DisplayYesNo                                                //          
+    //          Shorthand for accessing the DisplayCheckBoxes method when   //
+    //          using options "No" and "Yes" only. Converts int returned    //
+    //          DisplayCheckBoxes to bool                                   //
+    //                                                                      //
+    // PARAMS > prompt - optional string to be displayed above the          //
+    //                   options                                            //
+    //                                                                      //
+    // RETURN > (bool) the int returned from DisplayCheckBoxes converted to //
+    //          bool                                                        //
+    //----------------------------------------------------------------------//
+    public static bool DisplayYesNo( 
+        string prompt = "Select one of the following options:") 
+    {
+        int response = DisplayCheckBoxes(new string[]{"No", "Yes"}, prompt);
+        return Convert.ToBoolean(response);
     }
 
     //----------------------------------------------------------------------//
@@ -88,7 +109,7 @@ public static class ConsoleManager
             if (input < 1 || input > options.Length)
             {
                 SetCursorPosition(0, CursorTop - 1);
-                WriteColoredLine(
+                WriteLineColored(
                     $"{input} is outside the valid range of options.", 
                     ConsoleColor.Red);
             }
@@ -98,8 +119,13 @@ public static class ConsoleManager
         return input;
     }
 
-    // TODO - create method to display menu of options
-    //        accepts a dictionary as a param (display custom menu)
+    // TODO - create method for DisplayPaginationMenu
+    //        Takes string[] items and int itemsPerPage
+
+    // TODO - create method for DisplayCustomMenu
+    //        Takes a dictionary
+    //        KEY   - option ID (i.e, 1, 2, Q, etc.)
+    //        VALUE - option text (i.e., Add, Delete, Quit, etc.)  
 
     //----------------------------------------------------------------------//
     // METHOD > GetConvertedInput                                           //          
@@ -125,13 +151,13 @@ public static class ConsoleManager
         {
             // ...re-prompt for input if the conversion fails
             SetCursorPosition(0, CursorTop - 1);
-            WriteColoredLine(ex.Message, ConsoleColor.Red);
+            WriteLineColored(ex.Message, ConsoleColor.Red);
             return GetConvertedInput<T>(prompt);
         }
     }
 
     //----------------------------------------------------------------------//
-    // METHOD > WriteColoredLine                                            //          
+    // METHOD > WriteLineColored                                            //          
     //          Writes the given line of text to the console in the given   //
     //          color                                                       //
     //                                                                      //
@@ -140,7 +166,7 @@ public static class ConsoleManager
     //                                                                      //
     // RETURN > void                                                        //
     //----------------------------------------------------------------------//
-    public static void WriteColoredLine(string text, ConsoleColor color)
+    public static void WriteLineColored(string text, ConsoleColor color)
     {
         // Store current color to revert to after writing colored line
         ConsoleColor originalColor = ForegroundColor;
@@ -148,6 +174,29 @@ public static class ConsoleManager
         // Set new color; write to text to console
         ForegroundColor = color;
         WriteLine(text);
+        
+        // Revert to original foreground color
+        ForegroundColor = originalColor;
+    }
+
+    //----------------------------------------------------------------------//
+    // METHOD > WriteColored                                                //          
+    //          Writes the given text to the console in the given color     //
+    //          without addding a newline character to the end              //
+    //                                                                      //
+    // PARAMS > text - the text to be written to the console                //
+    //          color - the foreground color to apply to the text           //
+    //                                                                      //
+    // RETURN > void                                                        //
+    //----------------------------------------------------------------------//
+    public static void WriteColored(string text, ConsoleColor color)
+    {
+        // Store current color to revert to after writing colored line
+        ConsoleColor originalColor = ForegroundColor;
+
+        // Set new color; write to text to console
+        ForegroundColor = color;
+        Write(text);
         
         // Revert to original foreground color
         ForegroundColor = originalColor;
